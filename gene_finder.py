@@ -2,7 +2,7 @@
 """
 YOUR HEADER COMMENT HERE
 
-@author: YOUR NAME HERE
+@author:  March Saper
 
 """
 
@@ -29,9 +29,18 @@ def get_complement(nucleotide):
     'T'
     >>> get_complement('C')
     'G'
+    >>> get_complement('T')
+    'A'
+    >>> get_complement('G')
+    'C'
     """
-    # TODO: implement this
-    pass
+    two_nucleotide = nucleotide.replace('A', 'Placeholder_one')  # The placeholder waits to change "A" to "T" until after the "T"'s have been counted
+    three_nucleotide = two_nucleotide.replace('T', 'A')
+    four_nucleotide = three_nucleotide.replace('Placeholder_one', 'T')
+    five_nucleotide = four_nucleotide.replace('G', 'Placeholder_two')  # This placeholder acts like the one above
+    six_nucleotide = five_nucleotide.replace('C', 'G')
+    final_nucleotide = six_nucleotide.replace('Placeholder_two', 'C')  
+    return final_nucleotide
 
 
 def get_reverse_complement(dna):
@@ -44,9 +53,15 @@ def get_reverse_complement(dna):
     'AAAGCGGGCAT'
     >>> get_reverse_complement("CCGCGTTCA")
     'TGAACGCGG'
+    >>> get_reverse_complement("CCTTAAGG")
+    'GGAATTCC'
     """
-    # TODO: implement this
-    pass
+    # This function reverses the output of the get_complement function to get the reverse complement
+    complement = get_complement(dna)
+    reverse_complement = complement[::-1]  
+    return reverse_complement
+    
+        
 
 
 def rest_of_ORF(dna):
@@ -61,9 +76,19 @@ def rest_of_ORF(dna):
     'ATG'
     >>> rest_of_ORF("ATGAGATAGG")
     'ATGAGA'
+    >>> rest_of_ORF("ATATATATAT")
+    'ATATATATAT'
+    >>> rest_of_ORF("ATGATATG")
+    'ATGATATG'
     """
-    # TODO: implement this
-    pass
+    for i in range(0, len(dna)/3):
+        n = i*3  # You want to go through the function in units of three.  This does that.
+        if dna[n:n+3] == 'TAG' or dna[n:n+3] == 'TAA' or dna[n:n+3] == 'TGA':
+            return dna[:n]  # Return the dna sequence from the start to the last nucleotide before the stop codon.
+        
+    return dna  # If dna sequence makes it through the for loop without finding any stop codons, then the whole dna sequence will print.
+        
+    
 
 
 def find_all_ORFs_oneframe(dna):
@@ -78,9 +103,20 @@ def find_all_ORFs_oneframe(dna):
         returns: a list of non-nested ORFs
     >>> find_all_ORFs_oneframe("ATGCATGAATGTAGATAGATGTGCCC")
     ['ATGCATGAATGTAGA', 'ATGTGCCC']
+    >>> find_all_ORFs_oneframe("ATGCATTAGTTGATGAATTGA")
+    ['ATGCAT', 'ATGAAT']
     """
-    # TODO: implement this
-    pass
+    all_ORFs = []
+    i = 0
+    while i < len(dna):
+        if dna[i:i+3] == 'ATG':
+            manipulated_string = rest_of_ORF(dna[i:len(dna)])
+            i = i + len(manipulated_string)
+            all_ORFs.append(manipulated_string)
+        i = i + 3
+    return all_ORFs
+
+
 
 
 def find_all_ORFs(dna):
@@ -96,8 +132,13 @@ def find_all_ORFs(dna):
     >>> find_all_ORFs("ATGCATGAATGTAG")
     ['ATGCATGAATGTAG', 'ATGAATGTAG', 'ATG']
     """
-    # TODO: implement this
-    pass
+    
+    all_ORFs_all_frames = []
+    frame_one = find_all_ORFs_oneframe(dna[0:len(dna)])
+    frame_two = find_all_ORFs_oneframe(dna[1:len(dna)])
+    frame_three = find_all_ORFs_oneframe(dna[2:len(dna)])
+    all_ORFs_all_frames = frame_one + frame_two + frame_three
+    return all_ORFs_all_frames
 
 
 def find_all_ORFs_both_strands(dna):
@@ -109,8 +150,12 @@ def find_all_ORFs_both_strands(dna):
     >>> find_all_ORFs_both_strands("ATGCGAATGTAGCATCAAA")
     ['ATGCGAATG', 'ATGCTACATTCGCAT']
     """
-    # TODO: implement this
-    pass
+    everything_dna_related = []
+    complement_dna = get_reverse_complement(dna)
+    ORF_on_origional = find_all_ORFs(dna)
+    ORF_on_complement = find_all_ORFs(complement_dna)
+    everything_dna_related = ORF_on_origional + ORF_on_complement
+    return everything_dna_related
 
 
 def longest_ORF(dna):
@@ -163,4 +208,4 @@ def gene_finder(dna):
 
 if __name__ == "__main__":
     import doctest
-    doctest.testmod()
+doctest.run_docstring_examples(find_all_ORFs_both_strands, globals(), verbose = True)
