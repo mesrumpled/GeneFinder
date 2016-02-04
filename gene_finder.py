@@ -177,8 +177,12 @@ def longest_ORF(dna):
     'ATGTCA'
     """
     dna_list = find_all_ORFs_both_strands(dna)    # list of all of the possible ORFs in the input dna
-    longest_ORF = max(dna_list, key=len)    # finds the longest ORF in the list 
-    return longest_ORF    # returns the longest ORF
+    if len(dna_list) != 0:    # if ORFs are found continue on
+        longest_ORF_str = max(dna_list, key=len)    # finds the longest ORF in the list 
+        return longest_ORF_str    # returns the longest ORF
+    else:    # if no ORFs are found print a statement
+        print "No ORFs found."
+        return ""
 
 
 def longest_ORF_noncoding(dna, num_trials):
@@ -189,9 +193,9 @@ def longest_ORF_noncoding(dna, num_trials):
         num_trials: the number of random shuffles
         returns: the maximum length longest ORF """
     longest_ORF_len = 0    # initializes the longest ORF variable
-    for i in num_trials:
+    for i in range(num_trials):
         shuffled_dna = shuffle_string(dna)    # produces a new list of dna for each trial
-        shuffled_longest_ORF = longest_ORF(shuffled_dna)    # finds longest ORF in the newly shuffled dna
+        shuffled_longest_ORF = str(longest_ORF(shuffled_dna))    # finds longest ORF in the newly shuffled dna
         if len(shuffled_longest_ORF) > longest_ORF_len:    # if the length of the longest ORF is greater than the current length of the longest ORF updates the number
             longest_ORF_len = len(shuffled_longest_ORF)
     return longest_ORF_len    # returns an integer equal to the length of the longest ORF found
@@ -226,7 +230,8 @@ def gene_finder(dna):
     # TODO: implement this
     pass
 
+longest_ORF_noncoding("TGACATGTAG", 1)
+
 if __name__ == "__main__":
     import doctest
-    #find_all_ORFs_both_strands("TGACATGTAG")
-    doctest.run_docstring_examples(longest_ORF, globals(), verbose = True)
+    #doctest.run_docstring_examples(longest_ORF, globals(), verbose = True)
