@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-YOUR HEADER COMMENT HERE
+Gene finder takes a sequence of DNA and sorts it.
 
 @author:  March Saper
+With help from Rocco, Jennifer, Lauren, Coleman, and Max.
 
 """
 
@@ -34,10 +35,11 @@ def get_complement(nucleotide):
     >>> get_complement('G')
     'C'
     """
+    # This searches through the input string, replacing the nucleotides one type at a time.
     two_nucleotide = nucleotide.replace('A', 'Placeholder_one')  # The placeholder waits to change "A" to "T" until after the "T"'s have been counted
     three_nucleotide = two_nucleotide.replace('T', 'A')
     four_nucleotide = three_nucleotide.replace('Placeholder_one', 'T')
-    five_nucleotide = four_nucleotide.replace('G', 'Placeholder_two')  # This placeholder acts like the one above
+    five_nucleotide = four_nucleotide.replace('G', 'Placeholder_two')  # This placeholder waits to change "G" to "C" until after the "C"'s have been counted.
     six_nucleotide = five_nucleotide.replace('C', 'G')
     final_nucleotide = six_nucleotide.replace('Placeholder_two', 'C')  
     return final_nucleotide
@@ -106,14 +108,14 @@ def find_all_ORFs_oneframe(dna):
     >>> find_all_ORFs_oneframe("ATGCATTAGTTGATGAATTGA")
     ['ATGCAT', 'ATGAAT']
     """
-    all_ORFs = []
-    i = 0
-    while i < len(dna):
-        if dna[i:i+3] == 'ATG':
+    all_ORFs = []    # initialize output list
+    i = 0    # initialize index
+    while i < len(dna): 
+        if dna[i:i+3] == 'ATG':    # checks to see if index lands on a start codon.  If it does, trims the string at the corresponding stop codon
             manipulated_string = rest_of_ORF(dna[i:len(dna)])
             i = i + len(manipulated_string)
-            all_ORFs.append(manipulated_string)
-        i = i + 3
+            all_ORFs.append(manipulated_string)    # the trimmed string is added to the list of ORFs
+        i = i + 3    # moves index up by three in order to check only one reading frame
     return all_ORFs
 
 
@@ -129,15 +131,21 @@ def find_all_ORFs(dna):
         dna: a DNA sequence
         returns: a list of non-nested ORFs
 
-    >>> find_all_ORFs("ATGCATGAATGTAG")
-    ['ATGCATGAATGTAG', 'ATGAATGTAG', 'ATG']
+        >>> find_all_ORFs("ATGCATGAATGTAG")
+        ['ATGCATGAATGTAG', 'ATGAATGTAG', 'ATG']
+        >>> find_all_ORFs("GGATGATATAATGTAA")
+        ['ATG', 'ATGATA']
+        >>> find_all_ORFs("TGACATGTAG")
+        ['ATG']
+        >>> find_all_ORFs("CTACATGTCA")
+        ['ATGTCA']
     """
     
-    all_ORFs_all_frames = []
-    frame_one = find_all_ORFs_oneframe(dna[0:len(dna)])
-    frame_two = find_all_ORFs_oneframe(dna[1:len(dna)])
-    frame_three = find_all_ORFs_oneframe(dna[2:len(dna)])
-    all_ORFs_all_frames = frame_one + frame_two + frame_three
+    all_ORFs_all_frames = []    # initializes the output list
+    frame_one = find_all_ORFs_oneframe(dna[0:len(dna)])    # a list of ORFs starting in the first reading frame
+    frame_two = find_all_ORFs_oneframe(dna[1:len(dna)])    # a list of all ORFs starting in the second reading frame
+    frame_three = find_all_ORFs_oneframe(dna[2:len(dna)])    # a list of all ORFs starting in the second reading frame
+    all_ORFs_all_frames = frame_one + frame_two + frame_three    # a list of all the above 
     return all_ORFs_all_frames
 
 
@@ -147,13 +155,15 @@ def find_all_ORFs_both_strands(dna):
 
         dna: a DNA sequence
         returns: a list of non-nested ORFs
-    >>> find_all_ORFs_both_strands("ATGCGAATGTAGCATCAAA")
-    ['ATGCGAATG', 'ATGCTACATTCGCAT']
+        >>> find_all_ORFs_both_strands("ATGCGAATGTAGCATCAAA")
+        ['ATGCGAATG', 'ATGCTACATTCGCAT']
+        >>> find_all_ORFs_both_strands("TGACATGTAG")
+        ['ATG', 'ATGTCA']
     """
-    everything_dna_related = []
-    complement_dna = get_reverse_complement(dna)
-    ORF_on_origional = find_all_ORFs(dna)
-    ORF_on_complement = find_all_ORFs(complement_dna)
+    everything_dna_related = []    # initializes the output list
+    complement_dna = get_reverse_complement(dna)   
+    ORF_on_origional = find_all_ORFs(dna)    # finds a list of all the ORFs in the dna
+    ORF_on_complement = find_all_ORFs(complement_dna)    # finds a list of all the ORFs in the dna complement
     everything_dna_related = ORF_on_origional + ORF_on_complement
     return everything_dna_related
 
@@ -163,9 +173,12 @@ def longest_ORF(dna):
         as a string
     >>> longest_ORF("ATGCGAATGTAGCATCAAA")
     'ATGCTACATTCGCAT'
+    >>> longest_ORF("TGACATGTAG")
+    'ATGTCA'
     """
-    # TODO: implement this
-    pass
+    dna_list = find_all_ORFs_both_strands(dna)    # list of all of the possible ORFs in the input dna
+    longest_ORF = max(dna_list, key=len)    # finds the longest ORF in the list 
+    return longest_ORF    # returns the longest ORF
 
 
 def longest_ORF_noncoding(dna, num_trials):
@@ -175,8 +188,15 @@ def longest_ORF_noncoding(dna, num_trials):
         dna: a DNA sequence
         num_trials: the number of random shuffles
         returns: the maximum length longest ORF """
-    # TODO: implement this
-    pass
+    longest_ORF_len = 0    # initializes the longest ORF variable
+    for i in num_trials:
+        shuffled_dna = shuffle_string(dna)    # produces a new list of dna for each trial
+        shuffled_longest_ORF = longest_ORF(shuffled_dna)    # finds longest ORF in the newly shuffled dna
+        if len(shuffled_longest_ORF) > longest_ORF_len:    # if the length of the longest ORF is greater than the current length of the longest ORF updates the number
+            longest_ORF_len = len(shuffled_longest_ORF)
+    return longest_ORF_len    # returns an integer equal to the length of the longest ORF found
+
+
 
 
 def coding_strand_to_AA(dna):
@@ -208,4 +228,5 @@ def gene_finder(dna):
 
 if __name__ == "__main__":
     import doctest
-doctest.run_docstring_examples(find_all_ORFs_both_strands, globals(), verbose = True)
+    #find_all_ORFs_both_strands("TGACATGTAG")
+    doctest.run_docstring_examples(longest_ORF, globals(), verbose = True)
