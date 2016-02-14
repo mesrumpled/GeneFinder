@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Gene finder takes a sequence of DNA and returns a list of proteins.
+Written for Software Design 2016 at Olin College of Engineering.  Gene finder takes a sequence of DNA and returns a list of possible amino acids.
 
 @author:  March Saper
-With help from Rocco, Jennifer, Lauren, Coleman, Franton, and Max.
+
 
 """
 
@@ -235,7 +235,7 @@ def gene_finder(dna):
         >>> gene_finder("AAAAAAA")
         []
     """
-    threshold = longest_ORF_noncoding(dna, 1500)         # computes the threshold length that a sequence of open reading frame must be in order to be considered as a gene
+    threshold = longest_ORF_noncoding(dna, 100)         # computes the threshold length that a sequence of open reading frame must be in order to be considered as a gene
     all_the_dna = find_all_ORFs_both_strands(dna)    
     long_enough_dna = []    
     for item in range(len(all_the_dna)):
@@ -258,4 +258,3 @@ if __name__ == "__main__":
     from load import load_seq
     dna = load_seq("./data/X73525.fa")
     print gene_finder(dna)
-    
